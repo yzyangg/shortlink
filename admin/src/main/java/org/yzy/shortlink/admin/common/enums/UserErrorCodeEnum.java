@@ -9,9 +9,12 @@ import org.yzy.shortlink.admin.common.convention.errorcode.IErrorCode;
  * @date 2023/11/19 18:41
  */
 public enum UserErrorCodeEnum implements IErrorCode {
-    USER_NOT_EXIST("B000200", "用户不存在"),
     USER_NOT_LOGIN("B000201", "用户未登录"),
-    USER_NOT_AUTH("B000202", "用户无权限");
+    USER_NOT_EXIST("B000200", "用户不存在"),
+    USER_NOT_AUTH("B000202", "用户无权限"),
+
+    USER_EXIST("B000203", "用户已存在"),
+    USER_REGISTER_FAIL("B000204", "用户注册失败");
 
 
     UserErrorCodeEnum(String code, String message) {

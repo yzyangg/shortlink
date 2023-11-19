@@ -2,6 +2,7 @@ package org.yzy.shortlink.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.yzy.shortlink.admin.dao.entity.UserDO;
+import org.yzy.shortlink.admin.dto.req.UserRegisterReqDTO;
 import org.yzy.shortlink.admin.dto.resp.UserRespDTO;
 
 /**
@@ -18,4 +19,8 @@ public interface UserService extends IService<UserDO> {
      * @return
      */
     UserRespDTO getUserByUsername(String username);
+
+    Boolean hasUsername(String username);
+
+    void register(UserRegisterReqDTO userRegisterReqDTO);
 }

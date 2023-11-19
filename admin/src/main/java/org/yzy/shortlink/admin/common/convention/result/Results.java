@@ -17,7 +17,18 @@ public final class Results {
      */
     public static Result<Void> success() {
         return new Result<Void>()
-                .setCode(Result.SUCCESS_CODE);
+                .setCode(Result.SUCCESS_CODE)
+                .setMessage("success");
+    }
+
+    /**
+     * 构造成功响应
+     */
+    public static Result<Void> success(String message) {
+        return new Result<Void>()
+                .setCode(Result.SUCCESS_CODE)
+                .setMessage(message);
+
     }
 
     /**

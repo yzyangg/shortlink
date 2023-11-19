@@ -1,6 +1,8 @@
 package org.yzy.shortlink.admin.dto.resp;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
+import org.yzy.shortlink.admin.serialize.PhoneDesensitizationSerializer;
 
 /**
  * @author yzy
@@ -27,7 +29,9 @@ public class UserRespDTO {
 
     /**
      * 手机号
+     * 使用自定义的序列化器
      */
+    @JsonSerialize(using = PhoneDesensitizationSerializer.class)
     private String phone;
 
     /**
