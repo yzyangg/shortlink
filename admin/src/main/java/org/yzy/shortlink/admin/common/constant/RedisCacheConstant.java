@@ -13,4 +13,6 @@ public class RedisCacheConstant {
     public static final String USER_REGISTER_CACHE_PENETRATION_BLOOM_FILTER = "user_register_cache_penetration_bloom_filter";
 
     public static final String USER_REGISTER_LOCK = "short_link_lock";
+
+    public static final String USER_LOGIN_TOKEN = "short_link_token";
 }
