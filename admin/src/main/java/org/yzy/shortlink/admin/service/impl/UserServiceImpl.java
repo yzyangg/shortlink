@@ -114,7 +114,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
         String uuid = UUID.randomUUID().toString();
         stringRedisTemplate.opsForHash().put(LOGIN + userLoginReqDTO.getUsername(), uuid, JSON.toJSONString(userDO));
-        stringRedisTemplate.expire(LOGIN + userLoginReqDTO.getUsername(), 30, TimeUnit.MINUTES);
+        stringRedisTemplate.expire(LOGIN + userLoginReqDTO.getUsername(), 30, TimeUnit.DAYS);
         return new UserLoginRespDTO(uuid);
     }
 
@@ -124,7 +124,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
         // 检查token是否一致 一致则刷新过期时间
         if (redisTokenValue != null) {
-            stringRedisTemplate.expire(LOGIN + username, 30, TimeUnit.MINUTES);
+            stringRedisTemplate.expire(LOGIN + username, 30, TimeUnit.DAYS);
             return true;
         }
         return false;

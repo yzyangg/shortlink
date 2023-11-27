@@ -1,12 +1,17 @@
 package org.yzy.shortlink.admin.controller;
 
 import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.yzy.shortlink.admin.common.convention.result.Result;
 import org.yzy.shortlink.admin.common.convention.result.Results;
+import org.yzy.shortlink.admin.dto.req.ShortLinkUpdateReq;
+import org.yzy.shortlink.admin.dto.resp.ShortLinkGroupListRespDTO;
 import org.yzy.shortlink.admin.service.GroupService;
+
+import java.util.List;
 
 /**
  * @author yzy
@@ -32,6 +37,20 @@ public class GroupController {
     }
 
 
+    /**
+     * 获取分组列表
+     *
+     * @return
+     */
+    @GetMapping("/list")
+    public Result<List<ShortLinkGroupListRespDTO>> listGroup() {
+        return Results.success(groupService.listGroup());
+    }
+
+    @PostMapping("/update")
+    public Result<Void> updateGroup(@RequestBody ShortLinkUpdateReq shortLinkUpdateReq) {
+        return Results.success("功能待开发");
+    }
 
 
 }
