@@ -2,7 +2,7 @@ package org.yzy.shortlink.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.yzy.shortlink.admin.dao.entity.GroupDO;
-import org.yzy.shortlink.admin.dto.req.ShortLinkUpdateReq;
+import org.yzy.shortlink.admin.dto.req.LinkGroupUpdateReq;
 import org.yzy.shortlink.admin.dto.resp.ShortLinkGroupListRespDTO;
 
 import java.util.List;
@@ -18,5 +18,5 @@ public interface GroupService extends IService<GroupDO> {
 
     List<ShortLinkGroupListRespDTO> listGroup();
 
-    void updateGroup(ShortLinkUpdateReq shortLinkUpdateReq);
+    void updateGroup(LinkGroupUpdateReq linkGroupUpdateReq);
 }

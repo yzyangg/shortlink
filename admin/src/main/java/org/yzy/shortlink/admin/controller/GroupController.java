@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.yzy.shortlink.admin.common.convention.result.Result;
 import org.yzy.shortlink.admin.common.convention.result.Results;
-import org.yzy.shortlink.admin.dto.req.ShortLinkUpdateReq;
+import org.yzy.shortlink.admin.dto.req.LinkGroupUpdateReq;
 import org.yzy.shortlink.admin.dto.resp.ShortLinkGroupListRespDTO;
 import org.yzy.shortlink.admin.service.GroupService;
 
@@ -19,7 +19,7 @@ import java.util.List;
  * @description TODO
  * @date 2023/11/25 23:55
  */
-@RestController("/group")
+@RestController("/api/short-link/admin/group")
 @AllArgsConstructor
 public class GroupController {
 
@@ -48,7 +48,7 @@ public class GroupController {
     }
 
     @PostMapping("/update")
-    public Result<Void> updateGroup(@RequestBody ShortLinkUpdateReq shortLinkUpdateReq) {
+    public Result<Void> updateGroup(@RequestBody LinkGroupUpdateReq LinkGroupUpdateReq) {
         return Results.success("功能待开发");
     }
 

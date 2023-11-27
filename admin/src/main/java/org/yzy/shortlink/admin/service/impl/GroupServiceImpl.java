@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.yzy.shortlink.admin.common.biz.user.UserContext;
 import org.yzy.shortlink.admin.dao.entity.GroupDO;
 import org.yzy.shortlink.admin.dao.mapper.GroupMapper;
-import org.yzy.shortlink.admin.dto.req.ShortLinkUpdateReq;
+import org.yzy.shortlink.admin.dto.req.LinkGroupUpdateReq;
 import org.yzy.shortlink.admin.dto.resp.ShortLinkGroupListRespDTO;
 import org.yzy.shortlink.admin.service.GroupService;
 import org.yzy.shortlink.admin.util.NumberUtil;
@@ -47,7 +47,6 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
 
     @Override
     public List<ShortLinkGroupListRespDTO> listGroup() {
-        // TODO 获取用户名
 
         LambdaQueryWrapper<GroupDO> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(GroupDO::getUsername, UserContext.getUsername());
@@ -65,14 +64,14 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
     }
 
     @Override
-    public void updateGroup(ShortLinkUpdateReq shortLinkUpdateReq) {
+    public void updateGroup(LinkGroupUpdateReq LinkGroupUpdateReq) {
         LambdaUpdateWrapper<GroupDO> wrapper = new LambdaUpdateWrapper<GroupDO>()
                 .eq(GroupDO::getUsername, UserContext.getUsername())
-                .eq(!Objects.isNull(shortLinkUpdateReq.getId()), GroupDO::getId, shortLinkUpdateReq.getId())
+                .eq(!Objects.isNull(LinkGroupUpdateReq.getId()), GroupDO::getId, LinkGroupUpdateReq.getId())
                 .eq(GroupDO::getDelFlag, 0);
 
         GroupDO groupDO = new GroupDO();
-        groupDO.setName(shortLinkUpdateReq.getName());
+        groupDO.setName(LinkGroupUpdateReq.getName());
         baseMapper.update(groupDO, wrapper);
     }
 

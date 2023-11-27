@@ -19,7 +19,7 @@ import org.yzy.shortlink.admin.service.UserService;
  * @date 2023/11/19 17:53
  */
 @RestController
-@RequestMapping("/api/short-link/user")
+@RequestMapping("/api/short-link/admin/user")
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {
