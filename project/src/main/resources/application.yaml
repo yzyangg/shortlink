@@ -9,9 +9,8 @@ spring:
       host: 127.0.0.1
       port: 6379
   datasource:
-    hikari:
-      jdbc-url: jdbc:mysql://localhost:3306/shortlink?useUnicode=true&characterEncoding=UTF-8&rewriteBatchedStatements=true&allowMultiQueries=true&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      username: root
-      password: 2002
+    # ShardingSphere 对 Driver 自定义，实现分库分表等隐藏逻辑
+    driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
+    # ShardingSphere 配置文件路径
+    url: jdbc:shardingsphere:classpath:shardingsphere-config.yaml
 

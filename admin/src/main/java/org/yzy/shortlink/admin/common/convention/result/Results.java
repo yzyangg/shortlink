@@ -2,6 +2,7 @@ package org.yzy.shortlink.admin.common.convention.result;
 
 import org.yzy.shortlink.admin.common.convention.errorcode.BaseErrorCode;
 import org.yzy.shortlink.admin.common.convention.exception.AbstractException;
+import org.yzy.shortlink.admin.common.enums.UserErrorCodeEnum;
 
 import java.util.Optional;
 
@@ -72,4 +73,9 @@ public final class Results {
     }
 
 
+    public static Object failure(UserErrorCodeEnum userErrorCodeEnum) {
+        return new Result<Void>()
+                .setCode(userErrorCodeEnum.code())
+                .setMessage(userErrorCodeEnum.message());
+    }
 }

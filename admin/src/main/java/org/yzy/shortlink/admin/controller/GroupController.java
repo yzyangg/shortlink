@@ -1,10 +1,8 @@
 package org.yzy.shortlink.admin.controller;
 
-import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 import org.yzy.shortlink.admin.common.convention.result.Result;
 import org.yzy.shortlink.admin.common.convention.result.Results;
 import org.yzy.shortlink.admin.dto.req.LinkGroupUpdateReq;
@@ -19,8 +17,10 @@ import java.util.List;
  * @description TODO
  * @date 2023/11/25 23:55
  */
-@RestController("/api/short-link/admin/group")
-@AllArgsConstructor
+@RestController
+@RequestMapping("/api/short-link/admin/group")
+@RequiredArgsConstructor
+@Slf4j
 public class GroupController {
 
     public final GroupService groupService;

@@ -1,6 +1,7 @@
 package org.yzy.shortlink.project.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.text.StrBuilder;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,14 +33,10 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO shortLinkCreateReqDTO) {
 
         String shortURI = generateSuffix(shortLinkCreateReqDTO);
-        ShortLinkDO shortLinkDO = BeanUtil.copyProperties(shortLinkCreateReqDTO, ShortLinkDO.class);
-        String fullShortUrl = shortLinkCreateReqDTO.getDomain() + "/" + shortURI;
 
-        shortLinkDO.setShortUri(shortURI);
-        shortLinkDO.setEnableStatus(0);
-        shortLinkDO.setFullShortUrl(fullShortUrl);
+        String fullShortUrl = StrBuilder.create(shortLinkCreateReqDTO.getDomain()).append("/").append(shortURI).toString();
 
-
+        ShortLinkDO shortLinkDO = ShortLinkDO.builder().originUrl(shortLinkCreateReqDTO.getOriginUrl()).domain(shortLinkCreateReqDTO.getDomain()).gid(shortLinkCreateReqDTO.getGid()).createType(shortLinkCreateReqDTO.getCreateType()).describe(shortLinkCreateReqDTO.getDescribe()).validDate(shortLinkCreateReqDTO.getValidDate()).validDateType(shortLinkCreateReqDTO.getValidDateType()).shortUri(shortURI).enableStatus(0).fullShortUrl(fullShortUrl).build();
         // TODO 是否只允许一个短连接对应一个原始链接 ?
         try {
             baseMapper.insert(shortLinkDO);
@@ -48,7 +45,6 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             throw new ServiceException("短链接已存在，请勿重复创建");
         }
         shortURICreateCachePenetrationBloomFilter.add(fullShortUrl);
-
         return BeanUtil.copyProperties(shortLinkDO, ShortLinkCreateRespDTO.class);
     }
 

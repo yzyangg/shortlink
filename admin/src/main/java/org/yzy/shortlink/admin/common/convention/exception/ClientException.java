@@ -28,6 +28,10 @@ public class ClientException extends AbstractException {
         super(message, throwable, errorCode);
     }
 
+    public static ClientException of(IErrorCode errorCode) {
+        return new ClientException(errorCode);
+    }
+
     @Override
     public String toString() {
         return "ClientException{" +
