@@ -30,6 +30,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
     @Override
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO shortLinkCreateReqDTO) {
+
         String shortURI = generateSuffix(shortLinkCreateReqDTO);
         ShortLinkDO shortLinkDO = BeanUtil.copyProperties(shortLinkCreateReqDTO, ShortLinkDO.class);
         String fullShortUrl = shortLinkCreateReqDTO.getDomain() + "/" + shortURI;
@@ -38,12 +39,13 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         shortLinkDO.setEnableStatus(0);
         shortLinkDO.setFullShortUrl(fullShortUrl);
 
+
+        // TODO 是否只允许一个短连接对应一个原始链接 ?
         try {
             baseMapper.insert(shortLinkDO);
         } catch (DuplicateKeyException e) {
-            // 缓存中不存在，数据库中存在
             log.info("短链接已存在 {}", fullShortUrl);
-            throw new ServiceException("短链接已存在");
+            throw new ServiceException("短链接已存在，请勿重复创建");
         }
         shortURICreateCachePenetrationBloomFilter.add(fullShortUrl);
 
@@ -60,17 +62,18 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         String shortURI = "";
         String originUrl = shortLinkCreateReqDTO.getOriginUrl();
         String domain = shortLinkCreateReqDTO.getDomain();
-        int maxFrequencyCount = 1000;
-        int currentFrequencyCount = 0;
+        int maxCount = 10;
+        int currentCount = 0;
         while (true) {
-            if (currentFrequencyCount >= maxFrequencyCount) {
+            if (currentCount >= maxCount) {
                 throw new ServiceException("生成短链接失败");
             }
             shortURI = HashUtil.generateShortLink(originUrl);
+            shortURI += System.currentTimeMillis();
             if (!shortURICreateCachePenetrationBloomFilter.contains(domain + "/" + shortURI)) {
                 break;
             }
-            currentFrequencyCount++;
+            currentCount++;
         }
         return HashUtil.generateShortLink(Objects.requireNonNull(shortURI));
     }

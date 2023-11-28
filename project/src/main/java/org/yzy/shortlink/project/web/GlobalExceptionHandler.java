@@ -18,7 +18,7 @@ import org.yzy.shortlink.project.common.convention.result.Results;
 /**
  * @author yzy
  * @version 1.0
- * @description TODO
+ * @description 全局异常处理器
  * @date 2023/11/19 22:06
  */
 @Component
