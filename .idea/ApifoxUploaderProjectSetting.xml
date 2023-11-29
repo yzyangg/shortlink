@@ -9,6 +9,7 @@
         <option value="admin:3617120" />
         <option value="project:3617120" />
         <option value="shortlink-admin:3617120" />
+        <option value="shortlink-project:3617120" />
       </array>
     </option>
     <option name="yapiTokens" value="" />
