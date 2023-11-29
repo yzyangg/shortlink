@@ -1,30 +1,26 @@
 package org.yzy.shortlink.admin.config;
 
+
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RedissonClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author yzy
- * @version 1.0
- * @description TODO
- * @date 2023/11/19 23:51
+ * 布隆过滤器配置
  */
 @Configuration
 public class RBloomFilterConfiguration {
     /**
-     * 用户注册缓存穿透布隆过滤器
-     *
+     * 防止用户注册查询数据库的布隆过滤器
      * @param redissonClient redisson客户端
-     * @return 布隆过滤器
+     * @return 返回布隆过滤器
      */
     @Bean
-    public RBloomFilter<String> userRegisterCachePenetrationBloomFilter(RedissonClient redissonClient) {
-        RBloomFilter<String> cachePenetrationBloomFilter =
-                redissonClient.getBloomFilter("RBloomFilterConfiguration");
-        // 预计元素个数 : 误判率
-        cachePenetrationBloomFilter.tryInit(10000000L, 0.001);
-        return cachePenetrationBloomFilter;
+    public RBloomFilter<String> userRegisterCachePenetrationBloomFilter(RedissonClient  redissonClient){
+        RBloomFilter<String> cachePenetrationBloomFilter=  redissonClient.getBloomFilter("userRegisterCachePenetrationBloomFilter");
+        //tryInit两个核心参数 expectedInsertions预估布隆过滤器存储元素的长度  falseProbability 运行的误判率
+           cachePenetrationBloomFilter.tryInit(100000000L,0.001);
+           return cachePenetrationBloomFilter;
     }
 }

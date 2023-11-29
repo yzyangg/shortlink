@@ -1,21 +1,23 @@
 package org.yzy.shortlink.admin.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.yzy.shortlink.common.database.BaseDO;
+
 
 /**
- * @TableName t_group
+ * 短链接分组实体
  */
-@TableName(value = "t_group")
+@TableName(value ="t_group")
 @Data
-@Setter
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class GroupDO extends BaseDO {
     /**
      * ID
@@ -44,6 +46,4 @@ public class GroupDO extends BaseDO {
     private Integer sortOrder;
 
 
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
 }

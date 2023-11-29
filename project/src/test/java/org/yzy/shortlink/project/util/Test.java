@@ -8,8 +8,8 @@ class Test {
     @org.junit.jupiter.api.Test
     public void test() {
         for (int i = 0; i < 10; i++) {
-            String s = HashUtil.generateShortLink("https://www.baidu.com");
-            System.out.println(s);
+//            String s = HashUtil.generateShortLink("https://www.baidu.com");
+//            System.out.println(s);
         }
     }
 
