@@ -45,7 +45,6 @@ public class ShortLinkPageRespDTO {
     private String gid;
 
 
-
     /**
      * 有效期类型 0：永久有效 1：自定义有效期
      */
@@ -54,7 +53,7 @@ public class ShortLinkPageRespDTO {
     /**
      * 有效期
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" ,timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date validDate;
 
     /**
@@ -65,9 +64,8 @@ public class ShortLinkPageRespDTO {
     /**
      * 创建时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" ,timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
-
 
 
     /**

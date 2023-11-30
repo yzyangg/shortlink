@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="generator.mapper.TLink2Mapper">
+
+    <resultMap id="BaseResultMap" type="org.yzy.shortlink.project.dao.entity.ShortLinkDO">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="domain" column="domain" jdbcType="VARCHAR"/>
+        <result property="shortUri" column="short_uri" jdbcType="VARCHAR"/>
+        <result property="fullShortUrl" column="full_short_url" jdbcType="VARCHAR"/>
+        <result property="originUrl" column="origin_url" jdbcType="VARCHAR"/>
+        <result property="clickNum" column="click_num" jdbcType="INTEGER"/>
+        <result property="gid" column="gid" jdbcType="VARCHAR"/>
+        <result property="enableStatus" column="enable_status" jdbcType="TINYINT"/>
+        <result property="createType" column="create_type" jdbcType="TINYINT"/>
+        <result property="validDateType" column="valid_date_type" jdbcType="TINYINT"/>
+        <result property="validDate" column="valid_date" jdbcType="TIMESTAMP"/>
+        <result property="describe" column="describe" jdbcType="VARCHAR"/>
+        <result property="favicon" column="favicon" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="delFlag" column="del_flag" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,domain,short_uri,
+        full_short_url,origin_url,click_num,
+        gid,enable_status,create_type,
+        valid_date_type,valid_date,
+        describe,
+            favicon,create_time,update_time,
+            del_flag
+    </sql>
+</mapper>

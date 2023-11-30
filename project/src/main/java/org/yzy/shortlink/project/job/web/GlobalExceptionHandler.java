@@ -1,4 +1,4 @@
-package org.yzy.shortlink.project.web;
+package org.yzy.shortlink.project.job.web;
 
 
 import cn.hutool.core.collection.CollectionUtil;
@@ -22,7 +22,6 @@ import java.util.Optional;
 
 /**
  * 全局异常处理器
- *
  */
 @Component
 @Slf4j

@@ -13,7 +13,7 @@ import org.yzy.shortlink.common.database.BaseDO;
 /**
  * 短链接分组实体
  */
-@TableName(value ="t_group")
+@TableName(value = "t_group")
 @Data
 @Builder
 @NoArgsConstructor

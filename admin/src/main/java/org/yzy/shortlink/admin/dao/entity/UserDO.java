@@ -9,9 +9,10 @@ import org.yzy.shortlink.common.database.BaseDO;
 
 /**
  * 用户
+ *
  * @TableNamee t_user
  */
-@TableName(value ="t_user")
+@TableName(value = "t_user")
 @Data
 public class UserDO extends BaseDO {
     /**
@@ -51,7 +52,6 @@ public class UserDO extends BaseDO {
     private Long deletionTime;
 
 
-
     @Override
     public boolean equals(Object that) {
         if (this == that) {
@@ -65,15 +65,15 @@ public class UserDO extends BaseDO {
         }
         UserDO other = (UserDO) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getUsername() == null ? other.getUsername() == null : this.getUsername().equals(other.getUsername()))
-            && (this.getPassword() == null ? other.getPassword() == null : this.getPassword().equals(other.getPassword()))
-            && (this.getRealName() == null ? other.getRealName() == null : this.getRealName().equals(other.getRealName()))
-            && (this.getPhone() == null ? other.getPhone() == null : this.getPhone().equals(other.getPhone()))
-            && (this.getMail() == null ? other.getMail() == null : this.getMail().equals(other.getMail()))
-            && (this.getDeletionTime() == null ? other.getDeletionTime() == null : this.getDeletionTime().equals(other.getDeletionTime()))
-            && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
-            && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()))
-            && (this.getDelFlag() == null ? other.getDelFlag() == null : this.getDelFlag().equals(other.getDelFlag()));
+                && (this.getUsername() == null ? other.getUsername() == null : this.getUsername().equals(other.getUsername()))
+                && (this.getPassword() == null ? other.getPassword() == null : this.getPassword().equals(other.getPassword()))
+                && (this.getRealName() == null ? other.getRealName() == null : this.getRealName().equals(other.getRealName()))
+                && (this.getPhone() == null ? other.getPhone() == null : this.getPhone().equals(other.getPhone()))
+                && (this.getMail() == null ? other.getMail() == null : this.getMail().equals(other.getMail()))
+                && (this.getDeletionTime() == null ? other.getDeletionTime() == null : this.getDeletionTime().equals(other.getDeletionTime()))
+                && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
+                && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()))
+                && (this.getDelFlag() == null ? other.getDelFlag() == null : this.getDelFlag().equals(other.getDelFlag()));
     }
 
     @Override

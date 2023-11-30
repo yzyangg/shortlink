@@ -10,10 +10,10 @@ public class ShortLinkGroupSortReqDTO {
     /**
      * 分组id
      */
-   private String gid;
+    private String gid;
 
     /**
      * 排序
      */
-   private Integer sortOrder;
+    private Integer sortOrder;
 }

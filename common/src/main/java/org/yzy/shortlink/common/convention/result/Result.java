@@ -8,17 +8,18 @@ import java.io.Serializable;
 
 /**
  * 全局返回实体
+ *
  * @param <T> 泛型 返回的数据类型
  */
 @Data
 @Accessors(chain = true)
 public class Result<T> implements Serializable {
 
-    private static final long serialVersionUID = 5679018624309023727L;
     /**
      * 正确返回码
      */
-    public static final String SUCCESS_CODE="0";
+    public static final String SUCCESS_CODE = "0";
+    private static final long serialVersionUID = 5679018624309023727L;
     /**
      * 返回码
      */
@@ -35,7 +36,7 @@ public class Result<T> implements Serializable {
 
     private String requestId;
 
-    public boolean isSuccess(){
+    public boolean isSuccess() {
         return SUCCESS_CODE.equals(code);
     }
 

@@ -15,7 +15,7 @@ import java.util.Date;
 /**
  * 短链接实体类
  */
-@TableName(value ="t_link")
+@TableName(value = "t_link")
 @Data
 @Builder
 @AllArgsConstructor
@@ -87,7 +87,6 @@ public class ShortLinkDO extends BaseDO {
      * 网站标识
      */
     private String favicon;
-
 
 
 }

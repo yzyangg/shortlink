@@ -13,14 +13,16 @@ import org.springframework.context.annotation.Configuration;
 public class RBloomFilterConfiguration {
     /**
      * 防止用户注册查询数据库的布隆过滤器
+     *
      * @param redissonClient redisson客户端
      * @return 返回布隆过滤器
      */
     @Bean
-    public RBloomFilter<String> userRegisterCachePenetrationBloomFilter(RedissonClient  redissonClient){
-        RBloomFilter<String> cachePenetrationBloomFilter=  redissonClient.getBloomFilter("userRegisterCachePenetrationBloomFilter");
-        //tryInit两个核心参数 expectedInsertions预估布隆过滤器存储元素的长度  falseProbability 运行的误判率
-           cachePenetrationBloomFilter.tryInit(100000000L,0.001);
-           return cachePenetrationBloomFilter;
+    public RBloomFilter<String> userRegisterCachePenetrationBloomFilter(RedissonClient redissonClient) {
+        RBloomFilter<String> cachePenetrationBloomFilter =
+                redissonClient.getBloomFilter("userRegisterCachePenetrationBloomFilter");
+        // tryInit两个核心参数 expectedInsertions预估布隆过滤器存储元素的长度,falseProbability 运行的误判率
+        cachePenetrationBloomFilter.tryInit(100000000L, 0.001);
+        return cachePenetrationBloomFilter;
     }
 }

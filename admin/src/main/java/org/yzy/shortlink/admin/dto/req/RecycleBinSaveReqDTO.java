@@ -10,7 +10,7 @@ public class RecycleBinSaveReqDTO {
     /**
      * 分组标识
      */
-    private  String gid;
+    private String gid;
     /**
      * 完整短链接
      */
