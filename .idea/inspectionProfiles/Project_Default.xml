@@ -7,7 +7,7 @@
       </Languages>
     </inspection_tool>
     <inspection_tool class="JavadocDeclaration" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="ADDITIONAL_TAGS" value="description,date" />
+      <option name="ADDITIONAL_TAGS" value="description,date,TableNamee" />
     </inspection_tool>
   </profile>
 </component>

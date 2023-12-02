@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * @author yzy
  * @version 1.0
- * @description TODO
+ * @description admin启动类
  * @date 2023/11/19 16:30
  */
 @SpringBootApplication

@@ -3,16 +3,11 @@ package org.yzy.shortlink.admin.dao.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.yzy.shortlink.common.database.BaseDO;
 
 
-/**
- * 短链接分组实体
- */
+@EqualsAndHashCode(callSuper = true)
 @TableName(value = "t_group")
 @Data
 @Builder

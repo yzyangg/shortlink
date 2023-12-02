@@ -16,6 +16,7 @@ public final class Results {
      */
     public static Result<Void> success() {
         return new Result<Void>()
+                .setMessage("操作成功")
                 .setCode(Result.SUCCESS_CODE);
     }
 
