@@ -1,8 +1,8 @@
 package org.yzy.shortlink.common.convention.exception;
 
 
-import org.yzy.shortlink.common.convention.errorcode.BaseErrorCode;
 import org.yzy.shortlink.common.convention.errorcode.IErrorCode;
+import org.yzy.shortlink.common.enums.BaseErrorCode;
 
 /**
  * 远程服务调用异常

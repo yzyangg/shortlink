@@ -1,4 +1,4 @@
-package org.yzy.shortlink.admin.dto.response;
+package org.yzy.shortlink.admin.dto.resp;
 
 import lombok.Data;
 

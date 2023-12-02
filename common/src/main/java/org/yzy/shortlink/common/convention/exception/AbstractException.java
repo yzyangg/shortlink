@@ -1,7 +1,6 @@
 package org.yzy.shortlink.common.convention.exception;
 
 
-import cn.hutool.core.util.StrUtil;
 import lombok.Getter;
 import org.yzy.shortlink.common.convention.errorcode.IErrorCode;
 
@@ -19,7 +18,7 @@ public abstract class AbstractException extends RuntimeException {
 
         super(message, throwable);
         this.errorCode = errorCode.code();
-        this.errorMessage = Optional.ofNullable(StrUtil.length(message) == 0 ? message : null).orElse(errorCode.message());
+        this.errorMessage = Optional.ofNullable(message).orElse(errorCode.message());
 
     }
 }

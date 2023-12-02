@@ -1,6 +1,5 @@
 package org.yzy.shortlink.admin.biz.user;
 
-import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,10 +14,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserInfoDTO {
     /**
-     * ID
+     * userID
      */
-    @JSONField(name = "id")
-    private Long userId;
+    private Long id;
 
     /**
      * 用户名

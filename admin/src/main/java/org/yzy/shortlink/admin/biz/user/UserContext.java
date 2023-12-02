@@ -28,7 +28,7 @@ public final class UserContext {
      */
     public static String getUserId() {
         UserInfoDTO userInfoDTO = USER_THREAD_LOCAL.get();
-        return Objects.requireNonNull(Optional.ofNullable(userInfoDTO).map(UserInfoDTO::getUserId).orElse(null)).toString();
+        return Objects.requireNonNull(Optional.ofNullable(userInfoDTO).map(UserInfoDTO::getId).orElse(null)).toString();
     }
 
     /**
@@ -51,6 +51,13 @@ public final class UserContext {
         return Optional.ofNullable(userInfoDTO).map(UserInfoDTO::getRealName).orElse(null);
     }
 
+    /**
+     * 获取上下文中用户
+     * @return 用户
+     */
+    public static UserInfoDTO getUser() {
+        return USER_THREAD_LOCAL.get();
+    }
 
     /**
      * 清理用户上下文

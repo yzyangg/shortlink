@@ -1,8 +1,8 @@
 package org.yzy.shortlink.admin.biz.user;
 
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson2.JSON;
 import com.google.common.collect.Lists;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +16,7 @@ import org.yzy.shortlink.common.enums.UserErrorCodeEnum;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -40,22 +41,21 @@ public class UserTransmitFilter implements Filter {
             String method = httpServletRequest.getMethod();
             // 不是登录接口，需要校验用户信息
             if (!(Objects.equals(requestURI, "/api/shortLink/admin/v1/user") && Objects.equals(method, POST))) {
-                String userName = httpServletRequest.getHeader(UserConstant.USER_NAME_KEY);
                 String token = httpServletRequest.getHeader(UserConstant.USER_TOKEN_KEY);
-                if (!StrUtil.isAllNotBlank(userName, token)) {
+                if (!StrUtil.isAllNotBlank(token)) {
                     throw new ClientException(UserErrorCodeEnum.USER_TOKEN_FAIL);
                 }
-                String key = RedisCacheConstant.USER_LOGIN_KEY + userName;
-                Object userInfoJsonStr = null;
+                String key = RedisCacheConstant.USER_LOGIN_KEY + token;
+
+                UserInfoDTO userInfoDTO;
                 try {
-                    userInfoJsonStr = stringRedisTemplate.opsForHash().get(key, token);
-                    if (userInfoJsonStr == null) {
-                        throw new ClientException(UserErrorCodeEnum.USER_TOKEN_FAIL);
-                    }
+                    Map<Object, Object> userMap = stringRedisTemplate.opsForHash().entries(key);
+                    if (userMap.isEmpty()) throw new ClientException(UserErrorCodeEnum.USER_TOKEN_FAIL);
+                    userInfoDTO = BeanUtil.mapToBean(userMap, UserInfoDTO.class, false);
+                    if (userInfoDTO == null) throw new ClientException(UserErrorCodeEnum.USER_TOKEN_FAIL);
                 } catch (Exception ex) {
                     throw new ClientException(UserErrorCodeEnum.USER_TOKEN_FAIL);
                 }
-                UserInfoDTO userInfoDTO = JSON.parseObject(userInfoJsonStr.toString(), UserInfoDTO.class);
                 UserContext.setUser(userInfoDTO);
             }
         }

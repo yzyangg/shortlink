@@ -1,9 +1,15 @@
-package org.yzy.shortlink.common.convention.errorcode;
+package org.yzy.shortlink.common.enums;
+
+import org.yzy.shortlink.common.convention.errorcode.IErrorCode;
 
 public enum BaseErrorCode implements IErrorCode {
 
     // ========== 一级宏观错误码 客户端错误 ==========
     CLIENT_ERROR("A000001", "用户端错误"),
+
+    PARAM_EMPTY("A000002", "参数为空"),
+
+    TOKEN_EMPTY("A000003", "token为空"),
 
     // ========== 二级宏观错误码 用户注册错误 ==========
     USER_REGISTER_ERROR("A000100", "用户注册错误"),
@@ -36,6 +42,7 @@ public enum BaseErrorCode implements IErrorCode {
         this.code = code;
         this.message = message;
     }
+
 
     @Override
     public String code() {
