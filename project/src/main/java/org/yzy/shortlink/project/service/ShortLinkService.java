@@ -2,6 +2,8 @@ package org.yzy.shortlink.project.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import org.yzy.shortlink.project.dao.entity.ShortLinkDO;
 import org.yzy.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import org.yzy.shortlink.project.dto.req.ShortLinkPageReqDTO;
@@ -23,7 +25,9 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
 
     IPage<ShortLinkPageRespDTO> pageShortLink(ShortLinkPageReqDTO requestParam);
 
-    void updateShortLink(ShortLinkUpdateReqDTO requestParam);
+    ShortLinkDO updateShortLink(ShortLinkUpdateReqDTO requestParam);
 
     List<ShortLinkGroupCountQueryRespDTO> listGroupShortLinkCount(List<String> requestParam);
+
+    String restoreUrl(String shortUri, ServletRequest request, ServletResponse response);
 }

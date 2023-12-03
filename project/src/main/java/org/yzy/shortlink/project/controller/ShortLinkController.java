@@ -1,10 +1,13 @@
 package org.yzy.shortlink.project.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.yzy.shortlink.common.convention.result.Result;
 import org.yzy.shortlink.common.convention.result.Results;
+import org.yzy.shortlink.project.dao.entity.ShortLinkDO;
 import org.yzy.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import org.yzy.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import org.yzy.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
@@ -27,6 +30,14 @@ import java.util.List;
 public class ShortLinkController {
     private final ShortLinkService shortLinkService;
 
+
+    @GetMapping("/{short-uri}")
+    public Result<Void> restoreUrl(@PathVariable("short-uri") String shortUri, ServletRequest request, ServletResponse response) {
+        String originUrl = shortLinkService.restoreUrl(shortUri, request, response);
+        return Results.success(originUrl);
+    }
+
+
     /**
      * 创建短链接
      *
@@ -42,9 +53,8 @@ public class ShortLinkController {
      * 修改短链接
      */
     @PutMapping("/update")
-    public Result<Void> updateShortLink(@RequestBody ShortLinkUpdateReqDTO requestParam) {
-        shortLinkService.updateShortLink(requestParam);
-        return Results.success();
+    public Result<ShortLinkDO> updateShortLink(@RequestBody ShortLinkUpdateReqDTO requestParam) {
+        return Results.success(shortLinkService.updateShortLink(requestParam));
     }
 
     /**
@@ -57,11 +67,12 @@ public class ShortLinkController {
     public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO requestParam) {
         return Results.success(shortLinkService.pageShortLink(requestParam));
     }
+
     /**
      * 查询短链接分组内数量
      */
     @GetMapping("/count")
-    public Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam("requestParam") List<String> requestParam){
+    public Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam("requestParam") List<String> requestParam) {
         return Results.success(shortLinkService.listGroupShortLinkCount(requestParam));
     }
 }
