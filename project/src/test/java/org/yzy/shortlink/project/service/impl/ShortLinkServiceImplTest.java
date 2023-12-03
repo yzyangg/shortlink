@@ -1,6 +1,6 @@
 package org.yzy.shortlink.project.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.yzy.shortlink.project.BaseTest;
@@ -16,6 +16,8 @@ class ShortLinkServiceImplTest extends BaseTest {
     @Test
     public void testJob() {
         // 删除数据哭内半年前的数据
-        shortLinkService.remove(new QueryWrapper<ShortLinkDO>().lt("create_time", LocalDateTime.now().minusMonths(6)));
+        // 删除所有数据
+        LambdaQueryWrapper<ShortLinkDO> wrapper = new LambdaQueryWrapper<ShortLinkDO>().lt(ShortLinkDO::getCreateTime, LocalDateTime.now());
+        shortLinkService.remove(wrapper);
     }
 }

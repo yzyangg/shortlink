@@ -10,5 +10,4 @@ import org.yzy.shortlink.project.dao.entity.ShortLinkDO;
  */
 @Mapper
 public interface ShortLinkMapper extends BaseMapper<ShortLinkDO> {
-    void deleteByCreateTime();
 }
