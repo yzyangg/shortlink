@@ -1,5 +1,6 @@
 package org.yzy.shortlink.admin.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -10,13 +11,13 @@ import org.yzy.shortlink.admin.biz.user.UserContext;
 import org.yzy.shortlink.admin.dao.entity.GroupDO;
 import org.yzy.shortlink.admin.dao.mapper.GroupMapper;
 import org.yzy.shortlink.admin.dto.ShortLinkRemoteService;
-import org.yzy.shortlink.admin.dto.request.ShortLinkGroupSortReqDTO;
-import org.yzy.shortlink.admin.dto.request.ShortLinkGroupUpdateReqDTO;
+import org.yzy.shortlink.admin.dto.req.ShortLinkGroupSortReqDTO;
+import org.yzy.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
+import org.yzy.shortlink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.yzy.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
 import org.yzy.shortlink.admin.service.GroupService;
 import org.yzy.shortlink.admin.toolkit.RandomGenerator;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,7 +47,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
                 .builder()
                 .gid(gid)
                 .username(username)
-                .name(groupName)
+                .name(Optional.ofNullable(groupName).orElse("默认分组"))
                 .sortOrder(0)
                 .build();
         baseMapper.insert(groupDO);
@@ -54,7 +55,29 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
 
     @Override
     public List<ShortLinkGroupRespDTO> listGroup() {
-        return Collections.emptyList();
+        LambdaQueryWrapper<GroupDO> wrapper = Wrappers.lambdaQuery(GroupDO.class).
+                eq(GroupDO::getUsername, UserContext.getUsername())
+                .eq(GroupDO::getDelFlag, 0)
+                .orderByAsc(GroupDO::getSortOrder);
+
+        // 分组数据
+        List<GroupDO> groupDOS = baseMapper.selectList(wrapper);
+        // 分组下短链接数量
+        List<ShortLinkGroupCountQueryRespDTO> groupCountQueryRespDTOS =
+                shortLinkRemoteService.listGroupShortLinkCount(groupDOS.stream().map(GroupDO::getGid).toList()).getData();
+
+        // 组装返回数据
+        List<ShortLinkGroupRespDTO> shortLinkGroupRespDTOS = BeanUtil.copyToList(groupDOS, ShortLinkGroupRespDTO.class);
+        shortLinkGroupRespDTOS.forEach(one -> {
+            one.setShortLinkCount(
+                    groupCountQueryRespDTOS.stream()
+                            .filter(two -> one.getGid().equals(two.getGid()))
+                            .findFirst()
+                            .map(ShortLinkGroupCountQueryRespDTO::getShortLinkCount)
+                            .orElse(0)
+            );
+        });
+        return shortLinkGroupRespDTOS;
     }
 
     @Override

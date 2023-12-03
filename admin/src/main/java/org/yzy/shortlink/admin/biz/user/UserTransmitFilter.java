@@ -3,9 +3,11 @@ package org.yzy.shortlink.admin.biz.user;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSON;
 import com.google.common.collect.Lists;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -43,18 +45,20 @@ public class UserTransmitFilter implements Filter {
             if (!(Objects.equals(requestURI, "/api/shortLink/admin/v1/user") && Objects.equals(method, POST))) {
                 String token = httpServletRequest.getHeader(UserConstant.USER_TOKEN_KEY);
                 if (!StrUtil.isAllNotBlank(token)) {
-                    throw new ClientException(UserErrorCodeEnum.USER_TOKEN_FAIL);
+                    setResponse((HttpServletResponse) servletResponse, JSON.toJSONString(UserErrorCodeEnum.USER_TOKEN_FAIL));
+                    return;
                 }
                 String key = RedisCacheConstant.USER_LOGIN_KEY + token;
 
-                UserInfoDTO userInfoDTO;
+                UserInfoDTO userInfoDTO = null;
                 try {
                     Map<Object, Object> userMap = stringRedisTemplate.opsForHash().entries(key);
                     if (userMap.isEmpty()) throw new ClientException(UserErrorCodeEnum.USER_TOKEN_FAIL);
                     userInfoDTO = BeanUtil.mapToBean(userMap, UserInfoDTO.class, false);
                     if (userInfoDTO == null) throw new ClientException(UserErrorCodeEnum.USER_TOKEN_FAIL);
                 } catch (Exception ex) {
-                    throw new ClientException(UserErrorCodeEnum.USER_TOKEN_FAIL);
+                    setResponse((HttpServletResponse) servletResponse, JSON.toJSONString(UserErrorCodeEnum.USER_TOKEN_FAIL));
+                    return;
                 }
                 UserContext.setUser(userInfoDTO);
             }
@@ -64,5 +68,14 @@ public class UserTransmitFilter implements Filter {
         } finally {
             UserContext.removeUser();
         }
+    }
+
+    private void setResponse(HttpServletResponse response, String json) throws IOException {
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json; charset=utf-8");
+        ServletOutputStream out = response.getOutputStream();
+        out.write(json.getBytes("UTF-8"));
+        out.flush();
+        out.close();
     }
 }

@@ -3,9 +3,9 @@ package org.yzy.shortlink.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.yzy.shortlink.admin.dao.entity.UserDO;
-import org.yzy.shortlink.admin.dto.request.UserLoginReqDTO;
-import org.yzy.shortlink.admin.dto.request.UserRegisterReqDTO;
-import org.yzy.shortlink.admin.dto.request.UserUpdateReqDTO;
+import org.yzy.shortlink.admin.dto.req.UserLoginReqDTO;
+import org.yzy.shortlink.admin.dto.req.UserRegisterReqDTO;
+import org.yzy.shortlink.admin.dto.req.UserUpdateReqDTO;
 import org.yzy.shortlink.admin.dto.resp.UserLoginRespDTO;
 import org.yzy.shortlink.admin.dto.resp.UserRespDTO;
 

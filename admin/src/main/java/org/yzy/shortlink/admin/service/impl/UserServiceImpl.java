@@ -18,11 +18,12 @@ import org.springframework.stereotype.Service;
 import org.yzy.shortlink.admin.biz.user.UserContext;
 import org.yzy.shortlink.admin.dao.entity.UserDO;
 import org.yzy.shortlink.admin.dao.mapper.UserMapper;
-import org.yzy.shortlink.admin.dto.request.UserLoginReqDTO;
-import org.yzy.shortlink.admin.dto.request.UserRegisterReqDTO;
-import org.yzy.shortlink.admin.dto.request.UserUpdateReqDTO;
+import org.yzy.shortlink.admin.dto.req.UserLoginReqDTO;
+import org.yzy.shortlink.admin.dto.req.UserRegisterReqDTO;
+import org.yzy.shortlink.admin.dto.req.UserUpdateReqDTO;
 import org.yzy.shortlink.admin.dto.resp.UserLoginRespDTO;
 import org.yzy.shortlink.admin.dto.resp.UserRespDTO;
+import org.yzy.shortlink.admin.service.GroupService;
 import org.yzy.shortlink.admin.service.UserService;
 import org.yzy.shortlink.admin.toolkit.JWTUtil;
 import org.yzy.shortlink.common.convention.exception.ClientException;
@@ -46,6 +47,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     private final RBloomFilter<String> userRegisterCachePenetrationBloomFilter;
     private final RedissonClient redissonClient;
     private final StringRedisTemplate stringRedisTemplate;
+    private final GroupService groupService;
 
 
     @Override
@@ -77,6 +79,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 UserDO userDO = BeanUtil.toBean(requestParam, UserDO.class);
                 baseMapper.insert(userDO);
                 userRegisterCachePenetrationBloomFilter.add(username);
+                // 注册成功后默认创建一个分组
+                groupService.saveGroup("默认分组");
             } else {
                 throw new ClientException(UserErrorCodeEnum.USER_SAVE_ERROR);
             }

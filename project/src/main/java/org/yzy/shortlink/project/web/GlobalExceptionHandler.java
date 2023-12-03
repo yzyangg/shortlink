@@ -1,4 +1,4 @@
-package org.yzy.shortlink.project.job.web;
+package org.yzy.shortlink.project.web;
 
 
 import cn.hutool.core.collection.CollectionUtil;

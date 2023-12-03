@@ -3,8 +3,8 @@ package org.yzy.shortlink.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.yzy.shortlink.admin.dao.entity.GroupDO;
-import org.yzy.shortlink.admin.dto.request.ShortLinkGroupSortReqDTO;
-import org.yzy.shortlink.admin.dto.request.ShortLinkGroupUpdateReqDTO;
+import org.yzy.shortlink.admin.dto.req.ShortLinkGroupSortReqDTO;
+import org.yzy.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import org.yzy.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
 
 import java.util.List;

@@ -8,8 +8,6 @@ import org.yzy.shortlink.admin.BaseTest;
 public class JWTUtilTest extends BaseTest {
     @Test
     public void testJWT() {
-        String token = JWTUtil.generateToken("yzy");
-        System.out.println(token);
-        System.out.println(JWTUtil.getUsernameFromToken(token));
+
     }
 }

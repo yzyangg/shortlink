@@ -3,9 +3,9 @@ package org.yzy.shortlink.admin.controller;
 import groovy.util.logging.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.yzy.shortlink.admin.dto.request.UserLoginReqDTO;
-import org.yzy.shortlink.admin.dto.request.UserRegisterReqDTO;
-import org.yzy.shortlink.admin.dto.request.UserUpdateReqDTO;
+import org.yzy.shortlink.admin.dto.req.UserLoginReqDTO;
+import org.yzy.shortlink.admin.dto.req.UserRegisterReqDTO;
+import org.yzy.shortlink.admin.dto.req.UserUpdateReqDTO;
 import org.yzy.shortlink.admin.dto.resp.UserLoginRespDTO;
 import org.yzy.shortlink.admin.dto.resp.UserRespDTO;
 import org.yzy.shortlink.admin.service.UserService;
@@ -54,7 +54,7 @@ public class UserController {
      * @param requestParam 用户参数
      * @return 注册成功或者抛出异常
      */
-    @PostMapping()
+    @PostMapping("/")
     public Result<Void> register(@RequestBody UserRegisterReqDTO requestParam) {
         userService.register(requestParam);
         return Results.success("注册成功");
