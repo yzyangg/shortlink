@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.redisson.api.RBloomFilter;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.yzy.shortlink.common.convention.exception.ServiceException;
 import org.yzy.shortlink.project.dao.entity.ShortLinkDO;
@@ -47,6 +48,7 @@ import java.util.Optional;
 public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLinkDO> implements ShortLinkService {
     private final RBloomFilter<String> shortUriCreateCachePenetrationBloomFilter;
     private final ShortLinkGotoService shortLinkGotoService;
+    private final StringRedisTemplate stringRedisTemplate;:
 
     @Override
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam) {
@@ -81,6 +83,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
         ShortLinkCreateRespDTO shortLinkCreateRespDTO = new ShortLinkCreateRespDTO();
         BeanUtil.copyProperties(shortLinkDO, shortLinkCreateRespDTO);
+        shortLinkCreateRespDTO.setFullShortLink("http:/" + fullShortUrl);
         return shortLinkCreateRespDTO;
     }
 
@@ -167,6 +170,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoService.getOne(queryWrapper);
         Optional.ofNullable(shortLinkGotoDO).orElseThrow(() -> new ServiceException("短链接路由不存在"));
 
+        // 通过分组id和完整短链接去找到原始链接
         String gid = shortLinkGotoDO.getGid();
         LambdaQueryWrapper<ShortLinkDO> lambdaQueryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
                 .eq(ShortLinkDO::getGid, gid)
