@@ -7,4 +7,8 @@ public class RedisCacheConstant {
 
     public static final String LOCK_USER_REGISTER_KEY = "shortLink:lock:user-register:";
     public static final String USER_LOGIN_KEY = "shortLink:user:login_";
+
+    public static final String GOTO_SHORTLINK_KEY = "shortLink:go-to-url:";
+
+    public static final String LOCK_GOTO_SHORTLINK_KEY = "shortLink:lock:go-to-url:";
 }

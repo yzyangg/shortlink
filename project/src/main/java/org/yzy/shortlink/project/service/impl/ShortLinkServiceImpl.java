@@ -2,6 +2,7 @@ package org.yzy.shortlink.project.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.text.StrBuilder;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -11,12 +12,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.redisson.api.RBloomFilter;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.yzy.shortlink.common.constant.RedisCacheConstant;
 import org.yzy.shortlink.common.convention.exception.ServiceException;
 import org.yzy.shortlink.project.dao.entity.ShortLinkDO;
 import org.yzy.shortlink.project.dao.entity.ShortLinkGotoDO;
@@ -48,7 +51,8 @@ import java.util.Optional;
 public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLinkDO> implements ShortLinkService {
     private final RBloomFilter<String> shortUriCreateCachePenetrationBloomFilter;
     private final ShortLinkGotoService shortLinkGotoService;
-    private final StringRedisTemplate stringRedisTemplate;:
+    private final StringRedisTemplate stringRedisTemplate;
+    private final RedissonClient redissonClient;
 
     @Override
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam) {
@@ -158,35 +162,53 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         return BeanUtil.copyToList(shortLinkDOList, ShortLinkGroupCountQueryRespDTO.class);
     }
 
+    /**
+     * 短链接跳转 (暂时只返回原始连接)
+     */
     @Override
     public String restoreUrl(String shortUri, ServletRequest request, ServletResponse response) {
         // TODO 真实的跳转功能
         String serverName = request.getServerName();
         String fullShortUrl = StrBuilder.create(serverName).append("/").append(shortUri).toString();
+
         if (!shortUriCreateCachePenetrationBloomFilter.contains(fullShortUrl)) {
             throw new ServiceException("短链接不存在");
         }
-        LambdaQueryWrapper<ShortLinkGotoDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class).eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl);
-        ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoService.getOne(queryWrapper);
-        Optional.ofNullable(shortLinkGotoDO).orElseThrow(() -> new ServiceException("短链接路由不存在"));
+        // Redis 中查找完整短链接对应的原始链接
+        String originUrl;
+        originUrl = stringRedisTemplate.opsForValue().get(RedisCacheConstant.GOTO_SHORTLINK_KEY + fullShortUrl);
+        if (StrUtil.isBlank(originUrl)) {
+            // 重建缓存
+            RLock lock = redissonClient.getLock(RedisCacheConstant.LOCK_GOTO_SHORTLINK_KEY + fullShortUrl);
+            lock.lock();
+            try {
+                // 双重判断
+                originUrl = stringRedisTemplate.opsForValue().get(RedisCacheConstant.GOTO_SHORTLINK_KEY + fullShortUrl);
+                if (StrUtil.isBlank(originUrl)) {
+                    LambdaQueryWrapper<ShortLinkGotoDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class).eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl);
+                    ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoService.getOne(queryWrapper);
+                    Optional.ofNullable(shortLinkGotoDO).orElseThrow(() -> new ServiceException("短链接路由不存在"));
 
-        // 通过分组id和完整短链接去找到原始链接
-        String gid = shortLinkGotoDO.getGid();
-        LambdaQueryWrapper<ShortLinkDO> lambdaQueryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
-                .eq(ShortLinkDO::getGid, gid)
-                .eq(ShortLinkDO::getEnableStatus, 0)
-                .eq(ShortLinkDO::getDelFlag, 0)
-                .eq(ShortLinkDO::getFullShortUrl, fullShortUrl);
-        ShortLinkDO shortLinkDO = baseMapper.selectOne(lambdaQueryWrapper);
-
-        if (Objects.isNull(shortLinkDO)) {
-            throw new ServiceException("短链接不存在");
+                    // 通过分组id和完整短链接去找到原始链接
+                    String gid = shortLinkGotoDO.getGid();
+                    LambdaQueryWrapper<ShortLinkDO> lambdaQueryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
+                            .eq(ShortLinkDO::getGid, gid)
+                            .eq(ShortLinkDO::getEnableStatus, 0)
+                            .eq(ShortLinkDO::getDelFlag, 0)
+                            .eq(ShortLinkDO::getFullShortUrl, fullShortUrl);
+                    ShortLinkDO shortLinkDO = baseMapper.selectOne(lambdaQueryWrapper);
+                    if (Objects.isNull(shortLinkDO)) {
+                        throw new ServiceException("短链接不存在");
+                    }
+                    originUrl = shortLinkDO.getOriginUrl();
+                    stringRedisTemplate.opsForValue().set(RedisCacheConstant.GOTO_SHORTLINK_KEY + fullShortUrl, shortLinkDO.getOriginUrl());
+                    stringRedisTemplate.expire(RedisCacheConstant.GOTO_SHORTLINK_KEY + fullShortUrl, 30, java.util.concurrent.TimeUnit.DAYS);
+                }
+            } finally {
+                lock.unlock();
+            }
         }
-        String originUrl = shortLinkDO.getOriginUrl();
-        HttpServletResponse servletResponse = (HttpServletResponse) response;
-
         return originUrl;
-
     }
 
 
