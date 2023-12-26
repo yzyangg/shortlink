@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author yzy
@@ -163,51 +164,59 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     }
 
     /**
-     * 短链接跳转 (暂时只返回原始连接)
+     * 通过短链接拿到原始链接 (暂时只返回原始连接)
      */
     @Override
     public String restoreUrl(String shortUri, ServletRequest request, ServletResponse response) {
         // TODO 真实的跳转功能
         String serverName = request.getServerName();
         String fullShortUrl = StrBuilder.create(serverName).append("/").append(shortUri).toString();
-
+        String originUrl;
+        // Redis 中查找完整短链接对应的原始链接
+        originUrl = stringRedisTemplate.opsForValue().get(RedisCacheConstant.GOTO_SHORTLINK_KEY + fullShortUrl);
+        if (StrUtil.isNotBlank(originUrl)) {
+            return originUrl;
+        }
+        // 防止缓存穿透（布隆过滤器方式），在短链接创建时存入的fullShortUrl
         if (!shortUriCreateCachePenetrationBloomFilter.contains(fullShortUrl)) {
             throw new ServiceException("短链接不存在");
         }
-        // Redis 中查找完整短链接对应的原始链接
-        String originUrl;
-        originUrl = stringRedisTemplate.opsForValue().get(RedisCacheConstant.GOTO_SHORTLINK_KEY + fullShortUrl);
-        if (StrUtil.isBlank(originUrl)) {
-            // 重建缓存
-            RLock lock = redissonClient.getLock(RedisCacheConstant.LOCK_GOTO_SHORTLINK_KEY + fullShortUrl);
-            lock.lock();
-            try {
-                // 双重判断
-                originUrl = stringRedisTemplate.opsForValue().get(RedisCacheConstant.GOTO_SHORTLINK_KEY + fullShortUrl);
-                if (StrUtil.isBlank(originUrl)) {
-                    LambdaQueryWrapper<ShortLinkGotoDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class).eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl);
-                    ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoService.getOne(queryWrapper);
-                    Optional.ofNullable(shortLinkGotoDO).orElseThrow(() -> new ServiceException("短链接路由不存在"));
 
-                    // 通过分组id和完整短链接去找到原始链接
-                    String gid = shortLinkGotoDO.getGid();
-                    LambdaQueryWrapper<ShortLinkDO> lambdaQueryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
-                            .eq(ShortLinkDO::getGid, gid)
-                            .eq(ShortLinkDO::getEnableStatus, 0)
-                            .eq(ShortLinkDO::getDelFlag, 0)
-                            .eq(ShortLinkDO::getFullShortUrl, fullShortUrl);
-                    ShortLinkDO shortLinkDO = baseMapper.selectOne(lambdaQueryWrapper);
-                    if (Objects.isNull(shortLinkDO)) {
-                        throw new ServiceException("短链接不存在");
-                    }
-                    originUrl = shortLinkDO.getOriginUrl();
-                    stringRedisTemplate.opsForValue().set(RedisCacheConstant.GOTO_SHORTLINK_KEY + fullShortUrl, shortLinkDO.getOriginUrl());
-                    stringRedisTemplate.expire(RedisCacheConstant.GOTO_SHORTLINK_KEY + fullShortUrl, 30, java.util.concurrent.TimeUnit.DAYS);
-                }
-            } finally {
-                lock.unlock();
-            }
+        // 空跳转链接不为空（缓存了空值）TODO 感觉缓存控制空值有问题
+        String gotoNullShortLink = stringRedisTemplate.opsForValue().get(RedisCacheConstant.GOTO_IS_NULL_SHORTLINK_KEY + fullShortUrl);
+        if (gotoNullShortLink != null) {
+            return "";
         }
+        // 防止缓存穿透 （加锁重建缓存）
+        RLock lock = redissonClient.getLock(RedisCacheConstant.LOCK_GOTO_SHORTLINK_KEY + fullShortUrl);
+        lock.lock();
+        try {
+            // 双重判断
+            originUrl = stringRedisTemplate.opsForValue().get(RedisCacheConstant.GOTO_SHORTLINK_KEY + fullShortUrl);
+            if (StrUtil.isBlank(originUrl)) {
+                LambdaQueryWrapper<ShortLinkGotoDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class).eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl);
+                ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoService.getOne(queryWrapper);
+                Optional.ofNullable(shortLinkGotoDO).orElseThrow(() -> new ServiceException("短链接路由不存在"));
+
+                // 通过分组id和完整短链接去找到原始链接
+                String gid = shortLinkGotoDO.getGid();
+                LambdaQueryWrapper<ShortLinkDO> lambdaQueryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
+                        .eq(ShortLinkDO::getGid, gid)
+                        .eq(ShortLinkDO::getEnableStatus, 0)
+                        .eq(ShortLinkDO::getDelFlag, 0)
+                        .eq(ShortLinkDO::getFullShortUrl, fullShortUrl);
+                ShortLinkDO shortLinkDO = baseMapper.selectOne(lambdaQueryWrapper);
+                if (Objects.isNull(shortLinkDO)) {
+                    // 数据库中不存在，缓存空值，但如果key（fullShortUrl）每次都不一样，那存入redis也无意义 TODO 感觉有问题
+                    stringRedisTemplate.opsForValue().set(RedisCacheConstant.GOTO_IS_NULL_SHORTLINK_KEY + fullShortUrl, "-", 30, TimeUnit.MINUTES);
+                }
+                originUrl = shortLinkDO.getOriginUrl();
+                stringRedisTemplate.opsForValue().set(RedisCacheConstant.GOTO_SHORTLINK_KEY + fullShortUrl, shortLinkDO.getOriginUrl(), 30, TimeUnit.MINUTES);
+            }
+        } finally {
+            lock.unlock();
+        }
+
         return originUrl;
     }
 
