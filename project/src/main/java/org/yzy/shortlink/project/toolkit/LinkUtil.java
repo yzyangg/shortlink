@@ -15,12 +15,13 @@ public class LinkUtil {
     public static final long DEFAULT_CACHE_VALID_TIME = 2626560000L;
 
     /**
-     * 获取短链接缓存时间
+     * 计算当前时间与有效期之间的毫秒数
      *
      * @param date 有效期时间
      * @return 有效期时间戳
      */
     public static long getLinkCacheValidDate(Date date) {
+
         return Optional.ofNullable(date)
                 .map(each -> DateUtil.between(new Date(), each, DateUnit.MS))
                 .orElse(DEFAULT_CACHE_VALID_TIME);

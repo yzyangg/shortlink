@@ -33,6 +33,7 @@ import org.yzy.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import org.yzy.shortlink.project.service.ShortLinkGotoService;
 import org.yzy.shortlink.project.service.ShortLinkService;
 import org.yzy.shortlink.project.toolkit.HashUtil;
+import org.yzy.shortlink.project.toolkit.LinkUtil;
 
 import java.net.URL;
 import java.util.List;
@@ -78,6 +79,11 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .build();
         try {
             baseMapper.insert(shortLinkDO);
+            // 缓存预热，创建时就放进缓存之中
+            stringRedisTemplate.opsForValue().set(
+                    RedisCacheConstant.GOTO_SHORTLINK_KEY + fullShortUrl,
+                    requestParam.getOriginUrl(),
+                    LinkUtil.getLinkCacheValidDate(requestParam.getValidDate()), TimeUnit.MILLISECONDS);
             shortUriCreateCachePenetrationBloomFilter.add(fullShortUrl);
             // 创建短链接路由记录
             ShortLinkGotoDO shortLinkGotoDO = ShortLinkGotoDO.builder().fullShortUrl(fullShortUrl).gid(requestParam.getGid()).build();
