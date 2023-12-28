@@ -36,10 +36,7 @@ import org.yzy.shortlink.project.toolkit.HashUtil;
 import org.yzy.shortlink.project.toolkit.LinkUtil;
 
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -202,8 +199,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             if (StrUtil.isBlank(originUrl)) {
                 LambdaQueryWrapper<ShortLinkGotoDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class).eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl);
                 ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoService.getOne(queryWrapper);
-                Optional.ofNullable(shortLinkGotoDO).orElseThrow(() -> new ServiceException("短链接路由不存在"));
-
+                Optional.of(shortLinkGotoDO).orElseThrow(() -> new ServiceException("短链接路由不存在"));
                 // 通过分组id和完整短链接去找到原始链接
                 String gid = shortLinkGotoDO.getGid();
                 LambdaQueryWrapper<ShortLinkDO> lambdaQueryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
@@ -214,10 +210,17 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 ShortLinkDO shortLinkDO = baseMapper.selectOne(lambdaQueryWrapper);
                 if (Objects.isNull(shortLinkDO)) {
                     // 数据库中不存在，缓存空值，但如果key（fullShortUrl）每次都不一样，那存入redis也无意义 TODO 感觉有问题
+                    // TODO 正儿八经的设置过期时间
                     stringRedisTemplate.opsForValue().set(RedisCacheConstant.GOTO_IS_NULL_SHORTLINK_KEY + fullShortUrl, "-", 30, TimeUnit.MINUTES);
+                    return "";
                 }
-                originUrl = shortLinkDO.getOriginUrl();
+                // 是否过期
+                if (shortLinkDO.getValidDate() != null && shortLinkDO.getValidDate().after(new Date())) {
+                    return "";
+                }
+                // TODO 正儿八经的设置过期时间
                 stringRedisTemplate.opsForValue().set(RedisCacheConstant.GOTO_SHORTLINK_KEY + fullShortUrl, shortLinkDO.getOriginUrl(), 30, TimeUnit.MINUTES);
+                originUrl = shortLinkDO.getOriginUrl();
             }
         } finally {
             lock.unlock();
