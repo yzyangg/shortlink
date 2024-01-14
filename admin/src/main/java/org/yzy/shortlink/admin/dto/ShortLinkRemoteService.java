@@ -5,6 +5,7 @@ import cn.hutool.http.Method;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.springframework.stereotype.Service;
 import org.yzy.shortlink.admin.dto.resp.ShortLinkCreateRespDTO;
 import org.yzy.shortlink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.yzy.shortlink.common.convention.result.Result;
@@ -20,6 +21,8 @@ import java.util.Map;
 /**
  * 短链接中台原创调用服务
  */
+
+@Service
 public interface ShortLinkRemoteService {
     /**
      * 创建短链接

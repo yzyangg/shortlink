@@ -80,7 +80,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 baseMapper.insert(userDO);
                 userRegisterCachePenetrationBloomFilter.add(username);
                 // 注册成功后默认创建一个分组
-                groupService.saveGroup("默认分组");
+                groupService.saveGroup(username,"默认分组");
             } else {
                 throw new ClientException(UserErrorCodeEnum.USER_SAVE_ERROR);
             }

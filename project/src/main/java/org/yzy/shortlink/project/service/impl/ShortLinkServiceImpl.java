@@ -57,7 +57,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam) {
         String favicon = getFavicon(requestParam.getOriginUrl());
         String shortLinkSuffix = generateSuffix(requestParam);
-        String fullShortUrl = StrBuilder.create(requestParam.getDomain())
+        // TODO 先统一设置成localhost
+        String fullShortUrl = StrBuilder.create("localhost")
                 .append("/")
                 .append(shortLinkSuffix)
                 .toString();
@@ -120,7 +121,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
 
         ShortLinkDO one = this.baseMapper.selectOne(queryWrapper);
-        Optional.ofNullable(one).orElseThrow(() -> new ServiceException("短链接不存在"));
+        Optional.ofNullable(one).orElseThrow(() -> new ServiceException("短链接不存在或已被放入回收站"));
         if (Objects.equals(requestParam.getGid(), one.getGid())) {
             LambdaUpdateWrapper<ShortLinkDO> updateWrapper = Wrappers.lambdaUpdate(ShortLinkDO.class)
                     .eq(ShortLinkDO::getFullShortUrl, requestParam.getFullShortUrl())
@@ -182,7 +183,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         }
         // 防止缓存穿透（布隆过滤器方式），在短链接创建时存入的fullShortUrl
         if (!shortUriCreateCachePenetrationBloomFilter.contains(fullShortUrl)) {
-            throw new ServiceException("短链接不存在");
+            throw new ServiceException("短链接不存在或已被放入回收站");
         }
 
 
@@ -204,7 +205,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .eq(ShortLinkDO::getDelFlag, 0)
                         .eq(ShortLinkDO::getFullShortUrl, fullShortUrl);
                 ShortLinkDO shortLinkDO = baseMapper.selectOne(lambdaQueryWrapper);
-                Optional.ofNullable(shortLinkDO).orElseThrow(() -> new ServiceException("短链接不存在"));
+                Optional.ofNullable(shortLinkDO).orElseThrow(() -> new ServiceException("短链接不存在或已被放入回收站"));
                 // 是否过期
                 if (shortLinkDO.getValidDate() != null && shortLinkDO.getValidDate().after(new Date())) {
                     return "";

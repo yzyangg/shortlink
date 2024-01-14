@@ -28,9 +28,13 @@ import java.util.Objects;
 public class UserTransmitFilter implements Filter {
 
     public static final String POST = "POST";
+    /**
+     * 放行的接口
+     */
     private static final List<String> IGNORE_URI = Lists.newArrayList(
             "/api/shortLink/admin/v1/user/login",
-            "/api/shortLink/admin/v1/user/has-username"
+            "/api/shortLink/admin/v1/user/has-username",
+            "/api/shortLink/admin/v1/user"
     );
     private final StringRedisTemplate stringRedisTemplate;
 

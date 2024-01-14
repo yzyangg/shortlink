@@ -12,9 +12,7 @@ import org.yzy.shortlink.common.convention.result.Results;
 
 import java.util.List;
 
-/**
- * 短链接分组GroupController
- */
+
 @RestController
 @RequestMapping("/api/shortLink/admin/v1/group")
 @RequiredArgsConstructor

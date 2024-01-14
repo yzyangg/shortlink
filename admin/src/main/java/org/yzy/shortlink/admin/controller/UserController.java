@@ -54,7 +54,7 @@ public class UserController {
      * @param requestParam 用户参数
      * @return 注册成功或者抛出异常
      */
-    @PostMapping("/")
+    @PostMapping("")
     public Result<Void> register(@RequestBody UserRegisterReqDTO requestParam) {
         userService.register(requestParam);
         return Results.success("注册成功");
