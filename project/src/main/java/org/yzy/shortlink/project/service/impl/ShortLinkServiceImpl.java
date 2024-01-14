@@ -168,10 +168,10 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
     /**
      * 通过短链接拿到原始链接 (暂时只返回原始连接)
+     * TODO 真实的跳转功能
      */
     @Override
     public String restoreUrl(String shortUri, ServletRequest request, ServletResponse response) {
-        // TODO 真实的跳转功能
         String serverName = request.getServerName();
         String fullShortUrl = StrBuilder.create(serverName).append("/").append(shortUri).toString();
         String originUrl;
@@ -185,12 +185,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             throw new ServiceException("短链接不存在");
         }
 
-        // 空跳转链接不为空（缓存了空值）TODO 感觉缓存控制空值有问题
-        String gotoNullShortLink = stringRedisTemplate.opsForValue().get(RedisCacheConstant.GOTO_IS_NULL_SHORTLINK_KEY + fullShortUrl);
-        if (gotoNullShortLink != null) {
-            return "";
-        }
-        // 防止缓存穿透 （加锁重建缓存）
+
+        // 防止缓存击穿 （加锁重建缓存）
         RLock lock = redissonClient.getLock(RedisCacheConstant.LOCK_GOTO_SHORTLINK_KEY + fullShortUrl);
         lock.lock();
         try {
@@ -208,12 +204,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .eq(ShortLinkDO::getDelFlag, 0)
                         .eq(ShortLinkDO::getFullShortUrl, fullShortUrl);
                 ShortLinkDO shortLinkDO = baseMapper.selectOne(lambdaQueryWrapper);
-                if (Objects.isNull(shortLinkDO)) {
-                    // 数据库中不存在，缓存空值，但如果key（fullShortUrl）每次都不一样，那存入redis也无意义 TODO 感觉有问题
-                    // TODO 正儿八经的设置过期时间
-                    stringRedisTemplate.opsForValue().set(RedisCacheConstant.GOTO_IS_NULL_SHORTLINK_KEY + fullShortUrl, "-", 30, TimeUnit.MINUTES);
-                    return "";
-                }
+                Optional.ofNullable(shortLinkDO).orElseThrow(() -> new ServiceException("短链接不存在"));
                 // 是否过期
                 if (shortLinkDO.getValidDate() != null && shortLinkDO.getValidDate().after(new Date())) {
                     return "";

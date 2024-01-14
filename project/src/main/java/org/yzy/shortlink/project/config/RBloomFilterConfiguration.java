@@ -11,7 +11,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RBloomFilterConfiguration {
 
+    /**
+     * 布隆过滤器
+     * @param redissonClient
+     * @return
+     */
     @Bean
+
     public RBloomFilter<String> shortUriCreateCachePenetrationBloomFilter(RedissonClient redissonClient) {
         RBloomFilter<String> cachePenetrationBloomFilter = redissonClient.getBloomFilter("shortUriCreateCachePenetrationBloomFilter");
         //tryInit两个核心参数 expectedInsertions预估布隆过滤器存储元素的长度  falseProbability 运行的误判率

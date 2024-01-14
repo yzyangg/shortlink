@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * @author yzy
  * @version 1.0
- * @description TODO
+ * @description 短链接Controller
  * @date 2023/12/2 18:22
  */
 @RequestMapping("/api/shortLink/project/v1/shortlink")
