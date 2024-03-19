@@ -7,6 +7,7 @@
     <groupId>com.nageoffer.shortlink</groupId>
     <artifactId>shortlink-all</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <!--父模块 只做规约作用-->
     <packaging>pom</packaging>
 
     <modules>

@@ -114,7 +114,7 @@ import static com.nageoffer.shortlink.project.common.constant.RedisKeyConstant.S
 
 /**
  * 短链接接口实现层
- * 公众号：马丁玩编程，回复：加群，添加马哥微信（备注：link）获取项目资料
+ *   
  */
 @Slf4j
 @Service
@@ -247,6 +247,11 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .build();
     }
 
+    /**
+     * 批量创建短链接
+     * @param requestParam 批量创建短链接请求参数
+     * @return
+     */
     @Override
     public ShortLinkBatchCreateRespDTO batchCreateShortLink(ShortLinkBatchCreateReqDTO requestParam) {
         List<String> originUrls = requestParam.getOriginUrls();
@@ -466,25 +471,30 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .map(each -> ":" + each)
                 .orElse("");
         String fullShortUrl = serverName + serverPort + "/" + shortUri;
+        // 缓存中找链接
         String originalLink = stringRedisTemplate.opsForValue().get(String.format(GOTO_SHORT_LINK_KEY, fullShortUrl));
         if (StrUtil.isNotBlank(originalLink)) {
+            // 缓存不为空 直接跳转 并且统计监控信息
             ShortLinkStatsRecordDTO statsRecord = buildLinkStatsRecordAndSetUser(fullShortUrl, request, response);
             shortLinkStats(fullShortUrl, null, statsRecord);
             ((HttpServletResponse) response).sendRedirect(originalLink);
             return;
         }
+        // 创建时放入了布隆过滤器 如果不存在跳转notfound
         boolean contains = shortUriCreateCachePenetrationBloomFilter.contains(fullShortUrl);
         if (!contains) {
             ((HttpServletResponse) response).sendRedirect("/page/notfound");
             return;
         }
+        // TODO 缓存空链接跳转是否有问题
         String gotoIsNullShortLink = stringRedisTemplate.opsForValue().get(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl));
         if (StrUtil.isNotBlank(gotoIsNullShortLink)) {
             ((HttpServletResponse) response).sendRedirect("/page/notfound");
             return;
         }
         RLock lock = redissonClient.getLock(String.format(LOCK_GOTO_SHORT_LINK_KEY, fullShortUrl));
-        lock.lock();
+         lock.lock();
+         // 双检索 重建缓存
         try {
             originalLink = stringRedisTemplate.opsForValue().get(String.format(GOTO_SHORT_LINK_KEY, fullShortUrl));
             if (StrUtil.isNotBlank(originalLink)) {
@@ -507,6 +517,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .eq(ShortLinkDO::getDelFlag, 0)
                     .eq(ShortLinkDO::getEnableStatus, 0);
             ShortLinkDO shortLinkDO = baseMapper.selectOne(queryWrapper);
+            // 过期 删除 跳转notfound
             if (shortLinkDO == null || (shortLinkDO.getValidDate() != null && shortLinkDO.getValidDate().before(new Date()))) {
                 stringRedisTemplate.opsForValue().set(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl), "-", 30, TimeUnit.MINUTES);
                 ((HttpServletResponse) response).sendRedirect("/page/notfound");
@@ -577,6 +588,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         producerMap.put("fullShortUrl", fullShortUrl);
         producerMap.put("gid", gid);
         producerMap.put("statsRecord", JSON.toJSONString(statsRecord));
+        // 使用MQ优化成异步
         shortLinkStatsSaveProducer.send(producerMap);
     }
 
@@ -639,17 +651,17 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     }
 
     private void verificationWhitelist(String originUrl) {
-        Boolean enable = gotoDomainWhiteListConfiguration.getEnable();
-        if (enable == null || !enable) {
-            return;
-        }
-        String domain = LinkUtil.extractDomain(originUrl);
-        if (StrUtil.isBlank(domain)) {
-            throw new ClientException("跳转链接填写错误");
-        }
-        List<String> details = gotoDomainWhiteListConfiguration.getDetails();
-        if (!details.contains(domain)) {
-            throw new ClientException("演示环境为避免恶意攻击，请生成以下网站跳转链接：" + gotoDomainWhiteListConfiguration.getNames());
-        }
+//        Boolean enable = gotoDomainWhiteListConfiguration.getEnable();
+//        if (enable == null || !enable) {
+//            return;
+//        }
+//        String domain = LinkUtil.extractDomain(originUrl);
+//        if (StrUtil.isBlank(domain)) {
+//            throw new ClientException("跳转链接填写错误");
+//        }
+//        List<String> details = gotoDomainWhiteListConfiguration.getDetails();
+//        if (!details.contains(domain)) {
+//            throw new ClientException("演示环境为避免恶意攻击，请生成以下网站跳转链接：" + gotoDomainWhiteListConfiguration.getNames());
+//        }
     }
 }
