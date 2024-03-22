@@ -19,6 +19,20 @@ spring:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
+  rabbitmq:
+    username: guest
+    password: guest
+    host: 192.168.119.129
+    port: 5673
+    listener:
+      simple:
+        retry:
+          enabled: true # 开启重试
+          max-attempts: 2 # 最大重试次数
+          initial-interval: 2000 # 重试间隔
+          max-interval: 5000 # 最大重试间隔
+          multiplier: 2 # 间隔因子
+    publisher-confirm-type: correlated
 
 aggregation:
   remote-url: http://127.0.0.1:${server.port}

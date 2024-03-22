@@ -26,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 消息队列幂等处理器
- *
  */
 @Component
 @RequiredArgsConstructor
@@ -34,17 +33,18 @@ public class MessageQueueIdempotentHandler {
 
     private final StringRedisTemplate stringRedisTemplate;
 
-    private static final String IDEMPOTENT_KEY_PREFIX = "short-link:idempotent:";
+    public static final String IDEMPOTENT_KEY_PREFIX = "short-link:idempotent:";
 
     /**
-     * 判断当前消息是否消费过
+     * 设置真正处理
+     * 0 正在消费 1 消费完成
      *
      * @param messageId 消息唯一标识
      * @return 消息是否消费过
      */
-    public boolean isMessageProcessed(String messageId) {
+    public boolean setAndCheckMessageProcessed(String messageId) {
         String key = IDEMPOTENT_KEY_PREFIX + messageId;
-        return Boolean.TRUE.equals(stringRedisTemplate.opsForValue().setIfAbsent(key, "0", 2, TimeUnit.MINUTES));
+        return Boolean.TRUE.equals(stringRedisTemplate.opsForValue().setIfAbsent(key, "0", 2, TimeUnit.SECONDS));
     }
 
     /**
@@ -65,7 +65,7 @@ public class MessageQueueIdempotentHandler {
      */
     public void setAccomplish(String messageId) {
         String key = IDEMPOTENT_KEY_PREFIX + messageId;
-        stringRedisTemplate.opsForValue().set(key, "1", 2, TimeUnit.MINUTES);
+        stringRedisTemplate.opsForValue().set(key, "1", 2, TimeUnit.SECONDS);
     }
 
     /**

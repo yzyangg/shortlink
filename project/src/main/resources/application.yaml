@@ -19,12 +19,15 @@ spring:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
+
+
   rabbitmq:
-    host: 106.54.237.218
-    port: 5672
-    username: yzy
-    password: 123
+    username: guest
+    password: guest
+    host: 192.168.119.129
+    port: 5673
     virtual-host: /
+
 
 short-link:
   domain:
