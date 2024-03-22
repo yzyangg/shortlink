@@ -19,7 +19,6 @@ package com.nageoffer.shortlink.project.common.constant;
 
 /**
  * Redis Key 常量类
- *   
  */
 public class RedisKeyConstant {
 
@@ -72,4 +71,9 @@ public class RedisKeyConstant {
      * 创建短链接锁标识
      */
     public static final String SHORT_LINK_CREATE_LOCK_KEY = "short-link:lock:create";
+
+    /**
+     * Redission读写锁
+     */
+    public static final String SHORT_LINK_WRITE_READ_LOCK_KEY = "short-link:WRlock:";
 }
