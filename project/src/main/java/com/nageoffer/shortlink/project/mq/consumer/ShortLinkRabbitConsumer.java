@@ -66,8 +66,10 @@ public class ShortLinkRabbitConsumer {
         Map<String, String> producerMap = vo.getInfoMap();
         String id = producerMap.get("id");
         try {
-            // 消息已经处理完成 第一次来设置 0 如果成功 设置 1 第二次来肯定是键肯定是已经存在了
+            // 加上幂等标识
             if (!messageQueueIdempotentHandler.setAndCheckMessageProcessed(id)) {
+                // 防止 消费未完成并且 未删除幂等标识
+                // 必须在消费完成之后 才算 消息消费成功
                 if (messageQueueIdempotentHandler.isAccomplish(id)) return;
                 throw new ServiceException("消息未完成流程，需要消息队列重试");
             }
@@ -77,6 +79,7 @@ public class ShortLinkRabbitConsumer {
             actualSaveShortLinkStats(fullShortUrl, gid, statsRecord);
         } catch (ServiceException e) {
             log.info("消费者消费异常[{ }],即将重试", e);
+            messageQueueIdempotentHandler.delMessageProcessed(id);
             throw new ServiceException("需要消息队列重试");
         }
         messageQueueIdempotentHandler.setAccomplish(id);
