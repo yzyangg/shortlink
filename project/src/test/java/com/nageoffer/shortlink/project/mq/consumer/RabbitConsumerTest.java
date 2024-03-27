@@ -28,5 +28,4 @@ class RabbitConsumerTest {
         producer.send(vo);
 
     }
-
 }
