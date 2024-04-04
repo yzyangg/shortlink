@@ -278,6 +278,12 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         String serverPort = Optional.of(request.getServerPort()).filter(each -> !Objects.equals(each, 80)).map(String::valueOf).map(each -> ":" + each).orElse("");
         String fullShortUrl = serverName + serverPort + "/" + shortUri;
         // 缓存中找链接
+        // 创建时放入了布隆过滤器 如果不存在跳转notfound 布隆过滤器说不存在 那一定不存在
+        boolean contains = shortUriCreateCachePenetrationBloomFilter.contains(fullShortUrl);
+        if (!contains) {
+            ((HttpServletResponse) response).sendRedirect("/page/notfound");
+            return;
+        }
         String originalLink = stringRedisTemplate.opsForValue().get(String.format(GOTO_SHORT_LINK_KEY, fullShortUrl));
         if (StrUtil.isNotBlank(originalLink)) {
             // 缓存不为空 直接跳转 并且统计监控信息
@@ -286,12 +292,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             ((HttpServletResponse) response).sendRedirect(originalLink);
             return;
         }
-        // 创建时放入了布隆过滤器 如果不存在跳转notfound
-        boolean contains = shortUriCreateCachePenetrationBloomFilter.contains(fullShortUrl);
-        if (!contains) {
-            ((HttpServletResponse) response).sendRedirect("/page/notfound");
-            return;
-        }
+
         // TODO 缓存空链接跳转是否有问题
         String gotoIsNullShortLink = stringRedisTemplate.opsForValue().get(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl));
         if (StrUtil.isNotBlank(gotoIsNullShortLink)) {
