@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.nageoffer.shortlink.project.dao.entity.ShortLinkDO;
 import com.nageoffer.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 /**
@@ -46,4 +47,5 @@ public interface ShortLinkMapper extends BaseMapper<ShortLinkDO> {
      * 分页统计短链接
      */
     IPage<ShortLinkDO> pageLink(ShortLinkPageReqDTO requestParam);
+
 }
