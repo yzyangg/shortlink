@@ -347,14 +347,6 @@
           <CreateLink ref="createLink1Ref" :groupInfo="editableTabs" @onSubmit="addLink" @cancel="cancelAddLink"
             :defaultGid="pageParams.gid" :is-single="true"></CreateLink>
         </el-tab-pane>
-        <el-tab-pane>
-          <template #label>
-            <span class="custom-tabs-label">
-              <el-icon>
-                <Connection />
-              </el-icon>
-              <span>随机跳转</span>
-            </span> </template>暂未开发</el-tab-pane>
       </el-tabs>
     </el-dialog>
     <!-- 修改短链信息弹框 -->
